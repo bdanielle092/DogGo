@@ -32,7 +32,7 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, [Name], OwnerId, Breed 
+                        SELECT Id, [Name], OwnerId, Breed
                          From Dog
                     ";
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -63,7 +63,7 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, [Name], OwnerId, Breed, Notes, ImageUrl
+                        SELECT Id, [Name], OwnerId, Breed
                         FROM Dog
                         WHERE Id = @id";
 
@@ -79,19 +79,8 @@ namespace DogGo.Repositories
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
-                             
+                          
                         };
-
-                        // Check if optional columns are null
-                        if (reader.IsDBNull(reader.GetOrdinal("Notes")) == false)
-                        {
-                            dog.Notes = reader.GetString(reader.GetOrdinal("Notes"));
-                        }
-                        if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
-                        {
-                            dog.ImageUrl = reader.GetString(reader.GetOrdinal("Notes"));
-                        }
-
 
                         reader.Close();
                         return dog;
@@ -113,7 +102,7 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    INSERT INTO Dog ([Name], OwnerId, Breed, Notes, ImageUrl)
+                    INSERT INTO Dog ([Name], OwnerId, Breed)
                     OUTPUT INSERTED.ID
                     VALUES (@name, @OwnerId, @Breed);
                 ";
@@ -121,25 +110,9 @@ namespace DogGo.Repositories
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
-                if (dog.Notes == null)
-                {
-                    cmd.Parameters.AddWithValue("@notes", DBNull.Value);
-                }
-                else
-                {
-                    cmd.Parameters.AddWithValue("@notes", dog.Notes);
-                }
-                if (dog.ImageUrl == null)
-                {
-                    cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
-                }
-                else
-                {
-                    cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
-                }
+                    
 
-
-                int id = (int)cmd.ExecuteScalar();
+                    int id = (int)cmd.ExecuteScalar();
 
                     dog.Id = id;
                 }
@@ -160,29 +133,13 @@ namespace DogGo.Repositories
                                 [Name] = @name, 
                                 OwnerId = @ownerId, 
                                 Breed = @breed, 
-                                Notes = @notes,
-                                ImageUrl = @imageUrl
                             WHERE Id = @id";
 
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
                     cmd.Parameters.AddWithValue("@id", dog.Id);
-                    if (dog.Notes == null)
-                    {
-                        cmd.Parameters.AddWithValue("@notes", DBNull.Value);
-                    }
-                    else {
-                        cmd.Parameters.AddWithValue("@notes", dog.Notes);
-                    }
-                    if (dog.ImageUrl == null)
-                    {
-                        cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
-                    }
-                    else
-                    {
-                        cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
-                    }
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -244,7 +201,7 @@ namespace DogGo.Repositories
                         }
                         if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
                         {
-                            dog.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                            dog.ImageUrl = reader.GetString(reader.GetOrdinal("Notes"));
                         }
 
                         dogs.Add(dog);
