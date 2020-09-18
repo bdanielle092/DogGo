@@ -115,11 +115,46 @@ namespace DogGo.Repositories
         }
         public void UpdateWalk(Walk walk)
         {
-            throw new System.NotImplementedException();
+            using(SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using(SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                         UPDATE Walk
+                         SET
+                         [DATE] = @date,
+                         Duration = @duration,
+                         WalkerId = @walkerId
+                         DogId = @dogId
+                        WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@date", walk.Date);
+                    cmd.Parameters.AddWithValue("@duration", walk.Duration);
+                    cmd.Parameters.AddWithValue("@walkerId", walk.WalkerId);
+                    cmd.Parameters.AddWithValue("@dogId", walk.DogId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
         public void DeleteWalk(int walkId)
         {
-            throw new System.NotImplementedException();
+            
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        DELETE FROM Walk
+                        WHERE Id = @id
+                    ";
+
+                    cmd.Parameters.AddWithValue("@id", walkId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }
