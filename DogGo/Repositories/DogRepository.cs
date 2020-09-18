@@ -32,7 +32,7 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, [Name], OwnerId, Breed 
+                        SELECT Id, [Name], OwnerId, Breed
                          From Dog
                     ";
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -79,7 +79,7 @@ namespace DogGo.Repositories
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
-                             
+
                         };
 
                         // Check if optional columns are null
@@ -103,7 +103,7 @@ namespace DogGo.Repositories
             }
         }
 
-       
+
 
         public void AddDog(Dog dog)
         {
@@ -121,31 +121,30 @@ namespace DogGo.Repositories
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
-                if (dog.Notes == null)
-                {
-                    cmd.Parameters.AddWithValue("@notes", DBNull.Value);
-                }
-                else
-                {
-                    cmd.Parameters.AddWithValue("@notes", dog.Notes);
-                }
-                if (dog.ImageUrl == null)
-                {
-                    cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
-                }
-                else
-                {
-                    cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
-                }
+                    if (dog.Notes == null)
+                    {
+                        cmd.Parameters.AddWithValue("@notes", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@notes", dog.Notes);
+                    }
+                    if (dog.ImageUrl == null)
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
+                    }
 
 
-                int id = (int)cmd.ExecuteScalar();
+                    int id = (int)cmd.ExecuteScalar();
 
                     dog.Id = id;
                 }
             }
         }
-
         public void UpdateDog(Dog dog)
         {
             using (SqlConnection conn = Connection)
@@ -172,7 +171,8 @@ namespace DogGo.Repositories
                     {
                         cmd.Parameters.AddWithValue("@notes", DBNull.Value);
                     }
-                    else {
+                    else
+                    {
                         cmd.Parameters.AddWithValue("@notes", dog.Notes);
                     }
                     if (dog.ImageUrl == null)
@@ -244,7 +244,7 @@ namespace DogGo.Repositories
                         }
                         if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
                         {
-                            dog.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                            dog.ImageUrl = reader.GetString(reader.GetOrdinal("Notes"));
                         }
 
                         dogs.Add(dog);
