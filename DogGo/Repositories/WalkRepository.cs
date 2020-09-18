@@ -1,7 +1,9 @@
-﻿using DogGo.Models;
+﻿using DogGo.Controllers;
+using DogGo.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+
 
 namespace DogGo.Repositories
 {
@@ -156,5 +158,56 @@ namespace DogGo.Repositories
                 }
             }
         }
-    }
-}
+        public List<Walk>  GetWalksByWalkerId(int WalkerId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                      SELECT Walks.Id, [Date], Duration, WalkerId, DogId, Owner.Name
+                   FROM Walks 
+                    LEFT JOIN Dog on Walks.DogId = Dog.Id
+                    LEFT JOIN Owner on Dog.OwnerId = Owner.Id
+                      WHERE WalkerId =  @walkerId
+                    ";
+                    cmd.Parameters.AddWithValue("@walkerId", WalkerId);
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    List<Walk> walks = new List<Walk>();
+                    while (reader.Read())
+                    {
+                        Walk walk = new Walk
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Date = reader.GetDateTime(reader.GetOrdinal("Date")),
+                            Duration = reader.GetInt32(reader.GetOrdinal("Duration")),
+                            WalkerId = reader.GetInt32(reader.GetOrdinal("WalkerId")),
+                            DogId = reader.GetInt32(reader.GetOrdinal("DogId")),
+                            Dog  = new Dog
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            },
+                            Owner = new Owner
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                            }
+                        };
+                        walks.Add(walk);
+                    
+
+                        }
+                        reader.Close();
+                        return walks;
+                        }
+                
+                    }
+         
+                }
+            }
+        }
+
+
+    
+

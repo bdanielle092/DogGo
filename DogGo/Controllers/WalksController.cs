@@ -32,7 +32,12 @@ namespace DogGo.Controllers
         // GET: WalksController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Walk walk = _walkRepo.GetWalkById(id);
+            if(walk == null)
+            {
+                return NotFound();
+            }
+            return View(walk);
         }
 
         // GET: WalksController/Create
@@ -44,57 +49,68 @@ namespace DogGo.Controllers
         // POST: WalksController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Walk walk)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _walkRepo.AddWalk(walk);
+                return RedirectToAction("Index");
             }
-            catch
+            catch(Exception)
             {
-                return View();
+                return View(walk);
             }
         }
 
         // GET: WalksController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Walk walk = _walkRepo.GetWalkById(id);
+            if( walk == null)
+            {
+                return NotFound();
+            }
+            return View(walk);
         }
 
         // POST: WalksController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Walk walk)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _walkRepo.UpdateWalk(walk);
+                return RedirectToAction("Index");
+
             }
-            catch
+            catch(Exception)
             {
-                return View();
+                return View(walk);
             }
         }
 
         // GET: WalksController/Delete/5
         public ActionResult Delete(int id)
         {
+            Walk walk = _walkRepo.GetWalkById(id);
             return View();
         }
 
         // POST: WalksController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Walk walk)
         {
             try
             {
+                _walkRepo.DeleteWalk(id);
+
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View(walk);
             }
         }
     }
