@@ -35,24 +35,51 @@
             <img class="bg-info" src="@Model.walker.ImageUrl" alt="avatar" />
         </dd>
     </dl>
-    <table>
-        @foreach (var item in Model.walks)
-        {
-            <tr>
-                
-                <td>
-                    @Html.DisplayFor(modelItem => item.Date)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Duration)
-                </td>
-                
+    <div class="row">
+        <section class="col-8 container mt-5 .bg-white">
+            <h1 class="text-left">Recent walks</h1>
+            <div class="row">
+                <table class="table">
+                    <thead>
+                        <tr class="text-black-50">
+                            <th>
+                                <small>Date</small>
+                            </th>
+                            <th>
+                                <small>Client</small>
+                            </th>
+                            <th>
+                                <small>Duration</small>
+                            </th>
+                        <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.walks)
+                        {
+                            <tr>
 
-            </tr>
-        }
-    </table>
+                                <td>
+                                    @{ string dataString = item.Date.ToString("d");}
+                                    @Html.DisplayFor(modelItem => item.Date)
+                                </td>
+                                
+                                <td>
+                                    @{ int durationTime = item.Duration / 60; }
+                                    @Html.DisplayFor(modelItem => item.Duration)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+  
+        <section class="col-lg-4 col-md-8 container mt-5 .bg-secondary">
+            @{ int walkHours = Model.walks.Sum(walk => walk.Duration) / 3600;}
+            @{ int walkMintues = Model.walks.Sum(walk => walk.Duration) % 3600 / 60; }
+            <h3 class="text-muted">Total Walk Time: <span class="text-dark">@(walkHours)hr @(walkMintues)min</span></h3>
+            <a asp-action="Index">Back to List</a>
+        </section>
 </div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
 </div>
