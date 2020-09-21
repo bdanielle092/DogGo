@@ -167,7 +167,7 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                      SELECT Walks.Id, [Date], Duration, WalkerId, DogId, Owner.Name
+                      SELECT Walks.Id, [Date], Duration, WalkerId, DogId, Owner.Name as ownerName
                    FROM Walks 
                     LEFT JOIN Dog on Walks.DogId = Dog.Id
                     LEFT JOIN Owner on Dog.OwnerId = Owner.Id
@@ -185,13 +185,10 @@ namespace DogGo.Repositories
                             Duration = reader.GetInt32(reader.GetOrdinal("Duration")),
                             WalkerId = reader.GetInt32(reader.GetOrdinal("WalkerId")),
                             DogId = reader.GetInt32(reader.GetOrdinal("DogId")),
-                            Dog  = new Dog
-                            {
-                                Name = reader.GetString(reader.GetOrdinal("Name"))
-                            },
+                            
                             Owner = new Owner
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Name"))
+                                Name = reader.GetString(reader.GetOrdinal("ownerName"))
                             }
                         };
                         walks.Add(walk);

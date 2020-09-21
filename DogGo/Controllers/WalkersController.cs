@@ -37,8 +37,8 @@ namespace DogGo.Controllers
 
             WalkerProfileViewModel vm = new WalkerProfileViewModel()
             {
-                walker = walker,
-                walks = walks
+                Walker = walker,
+                Walks = walks
             };
             return View(vm);
         }

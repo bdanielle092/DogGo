@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using DogGo.Models;
 using DogGo.Models.ViewModels;
 using DogGo.Repositories;
 using DogGo.Repository;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -89,8 +92,8 @@ namespace DogGo.Controllers
 
             OwnerFormViewModel vm = new OwnerFormViewModel()
             {
-               Owner = _ownerRepo.GetOwnerById(id),
-               Neighborhoods = neighborhoods
+                Owner = _ownerRepo.GetOwnerById(id),
+                Neighborhoods = neighborhoods
             };
 
             if (vm.Owner == null)
@@ -140,6 +143,40 @@ namespace DogGo.Controllers
             {
                 return View(owner);
             }
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Login(LoginViewModel viewModel)
+        {
+            // getting the users email
+            Owner owner = _ownerRepo.GetOwnerByEmail(viewModel.Email);
+            //if not a user retrun unathorized
+            if (owner == null)
+            {
+                return Unauthorized();
+            }
+            //otherwise pull user info
+            var claims = new List<Claim>
+            //this is getting the users info 
+    {
+        new Claim(ClaimTypes.NameIdentifier, owner.Id.ToString()),
+        new Claim(ClaimTypes.Email, owner.Email),
+        new Claim(ClaimTypes.Role, "DogOwner"),
+    };
+            //this saying the user is authorized
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //this say this user is signed in
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+            //show them the dogs
+            return RedirectToAction("Index", "Dogs");
         }
     }
 }
