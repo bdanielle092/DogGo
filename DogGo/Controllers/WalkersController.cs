@@ -8,6 +8,7 @@ using DogGo.Repositories;
 using DogGo.Models;
 using DogGo.Repository;
 using DogGo.Models.ViewModels;
+using System.Security.Claims;
 
 namespace DogGo.Controllers
 {
@@ -21,12 +22,29 @@ namespace DogGo.Controllers
             _walkerRepo = walkerRepository;
             _walkRepo = walkRepository;
         }
+
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
+        }
         // GET: WalkerController
         public ActionResult Index()
         {
-            List<Walker> walkers = _walkerRepo.GetAllWalkers();
+            try
+            {
+                // if you are the current user it will show the walkers in your neighborhood
+                int ownerId = GetCurrentUserId();
+                List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(ownerId);
 
-            return View(walkers);
+                return View(walkers);
+            }
+            catch
+            {
+                // if you are not login it will show you a list of walkers
+                List<Walker> allWalkers = _walkerRepo.GetAllWalkers();
+                return View(allWalkers);
+             }
         }
 
         // GET: WalkerController/Details/5
