@@ -85,8 +85,8 @@ namespace DogGo.Controllers
         {
             int ownerId = GetCurrentUserId();
             Dog dog = _dogRepo.GetDogById(id);
-
-            if (dog == null)
+            // if ownerId doesnt not match the dog ownerId it will return a 404 not found 
+            if (dog == null || dog.OwnerId != ownerId)
             {
                 return NotFound();
             }
@@ -120,8 +120,16 @@ namespace DogGo.Controllers
         {
             int ownerId = GetCurrentUserId();
             Dog dog = _dogRepo.GetDogById(id);
-            return View();
+            // if ownerId doesnt not match the dog ownerId it will return a 404 not found 
+            if (dog.OwnerId != ownerId)
+            {
+                return NotFound();
+            }
+                return View(dog);
+
         }
+            
+        
 
         // POST: DogsController/Delete/5
         [HttpPost]
