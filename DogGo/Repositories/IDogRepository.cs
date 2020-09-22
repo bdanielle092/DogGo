@@ -13,7 +13,7 @@ namespace DogGo.Repositories
 
         Dog GetDogById(int id);
        
-        void AddDog(Dog newdog);
+        void AddDog(Dog newDog);
         void UpdateDog(Dog dog);
         void DeleteDog(int dogId);
     }

@@ -2,6 +2,7 @@
 using DogGo.Repository;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 
 namespace DogGo.Repositories
@@ -50,11 +51,14 @@ namespace DogGo.Repositories
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                            
                             NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
                             Neighborhood = neighborhood 
                         };
-
+                        if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
+                        {
+                            walker.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                        }
                         walkers.Add(walker);
                     }
 
@@ -93,10 +97,14 @@ namespace DogGo.Repositories
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                         
                             NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
                             Neighborhood = neighborhood
                         };
+                        if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
+                        {
+                            walker.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                        }
                         //return walker if they have an info
                         reader.Close();
                         return walker;
@@ -152,6 +160,53 @@ namespace DogGo.Repositories
                     reader.Close();
 
                     return walkers;
+                }
+            }
+        }
+        public void AddWalker(Walker newWalker)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = 
+                    conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Walker ([Name], ImageUrl, NeighborhoodId )
+                                     OUTPUT INSERTED.ID
+                                      VALUES (@name, @imageUrl, @neighborhoodId)";
+                    
+                    cmd.Parameters.AddWithValue("@name", newWalker.Name);
+                    cmd.Parameters.AddWithValue("@neighborhoodId", newWalker.NeighborhoodId);
+                    
+                    if (newWalker.ImageUrl == null)
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", newWalker.ImageUrl);
+                    }
+
+                    newWalker.Id = (int)cmd.ExecuteScalar();
+                }
+            }
+        }
+        public void DeleteWalker(int walkerId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            DELETE FROM Walker
+                            WHERE Id = @id
+                        ";
+
+                    cmd.Parameters.AddWithValue("@id", walkerId);
+
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
